@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Linkered</title>
+</head>
+<body>
+<div id="a">
+<h3>Linkered</h3>
+<form onsubmit="g(event)">
+<label>Enter Link: <input type="url" id="u" required placeholder="https://example.com"></label>
+<button>Generate</button>
+</form>
+<p id="r" style="display:none"></p>
+</div>
+<script>
+let p=new URLSearchParams(location.search),t=p.get('tagID');
+if(t){
+let u=localStorage.getItem(t);
+if(u)location.replace(u);
+else document.body.innerHTML='<h3>Link not found.</h3>';
+}
+function g(e){
+e.preventDefault();
+let id=Array.from(crypto.getRandomValues(new Uint8Array(15)),b=>b.toString(16).padStart(2,'0')).join('');
+localStorage.setItem(id,document.getElementById('u').value);
+let l=`https://linkered.vercel.app/?tagID=${id}`,r=document.getElementById('r');
+r.innerHTML=`Link: <a href="${l}">${l}</a> <button onclick="navigator.clipboard.writeText('${l}')">Copy</button>`;
+r.style.display='block';
+}
+</script>
+</body>
+</html>
