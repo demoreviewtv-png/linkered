@@ -3,6 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <title>Linkered</title>
+  <style>
+    body{
+      color: #FFFFFF;
+      background-color: #000000;
+      font-family: "VT323", monospace;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="a">
@@ -16,15 +26,19 @@
 <script>
 let p=new URLSearchParams(location.search),t=p.get('tagID');
 if(t){
-let u=localStorage.getItem(t);
-if(u)location.replace(u);
-else document.body.innerHTML='<h3>Link not found.</h3>';
+try{
+let u=atob(t);
+if(!/^https?:\/\//i.test(u))u='https://'+u;
+document.body.innerHTML='<h3>Redirecting...</h3>';
+location.replace(u);
+}catch(e){
+document.body.innerHTML='<h3>Invalid Link.</h3>';
+}
 }
 function g(e){
 e.preventDefault();
-let id=Array.from(crypto.getRandomValues(new Uint8Array(15)),b=>b.toString(16).padStart(2,'0')).join('');
-localStorage.setItem(id,document.getElementById('u').value);
-let l=`https://linkered.vercel.app/?tagID=${id}`,r=document.getElementById('r');
+let v=document.getElementById('u').value,b=btoa(v);
+let l=`https://linkered.vercel.app/?tagID=${b}`,r=document.getElementById('r');
 r.innerHTML=`Link: <a href="${l}">${l}</a> <button onclick="navigator.clipboard.writeText('${l}')">Copy</button>`;
 r.style.display='block';
 }
