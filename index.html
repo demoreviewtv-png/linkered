@@ -4,61 +4,67 @@
 <meta charset="UTF-8">
 <title>Linkered</title>
   <style>
-    body{
+    body {
       color: #FFFFFF;
       background-color: #000000;
       font-family: "VT323", monospace;
+      font-size: 24px;
       padding: 20px;
     }
     input, button {
-      font-family: "VT323", monospace;
-      font-size: 1rem;
+      font-family: inherit;
+      font-size: inherit;
       background: #111;
       color: #fff;
-      border: 1px solid #444;
-      padding: 4px 8px;
-    }
-    button {
+      border: 1px solid #fff;
+      padding: 5px 10px;
       cursor: pointer;
     }
-    button:hover {
-      background: #222;
-    }
-    a {
-      color: #00ffcc;
-    }
+    a { color: #00ffcc; }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="a">
-<h3>Linkered</h3>
-<form onsubmit="g(event)">
-<label>Enter Link: <input type="url" id="u" required placeholder="https://example.com"></label>
-<button>Generate</button>
-</form>
-<p id="r" style="display:none"></p>
+  <h3>Linkered</h3>
+  <form onsubmit="g(event)">
+    <label>Enter Link: <input type="url" id="u" required placeholder="https://example.com or custom://"></label>
+    <button>Generate</button>
+  </form>
+  <p id="r" style="display:none"></p>
 </div>
 <script>
-let p=new URLSearchParams(location.search),t=p.get('tagID');
-if(t){
-try{
-let u=atob(t);
-if(!/^https?:\/\//i.test(u))u='https://'+u;
-document.body.innerHTML='<h3>Redirecting...</h3>';
-location.replace(u);
-}catch(e){
-document.body.innerHTML='<h3>Invalid Link.</h3>';
+// Base64URL Helpers (URL safe)
+function toB64Url(str) {
+  return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
+function fromB64Url(str) {
+  let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+  while (b64.length % 4) b64 += '=';
+  return decodeURIComponent(escape(atob(b64)));
 }
-function g(e){
-e.preventDefault();
-let v=document.getElementById('u').value,b=btoa(v);
-let l=`https://linkered.vercel.app/?tagID=${b}`,r=document.getElementById('r');
-r.innerHTML=`Link: <a href="${l}">${l}</a> <button onclick="navigator.clipboard.writeText('${l}')">Copy</button>`;
-r.style.display='block';
+
+let p = new URLSearchParams(location.search), t = p.get('tagID');
+if (t) {
+  try {
+    let u = fromB64Url(t);
+    document.body.innerHTML = `<h3>Redirecting to: ${u}</h3><p>If you are not redirected automatically, <a href="${u}">click here</a>.</p>`;
+    
+    // Attempt automatic redirect
+    location.replace(u);
+  } catch (e) {
+    document.body.innerHTML = '<h3>Invalid Link.</h3>';
+  }
+}
+
+function g(e) {
+  e.preventDefault();
+  let v = document.getElementById('u').value, b = toB64Url(v);
+  let l = `https://linkered.vercel.app/?tagID=${b}`, r = document.getElementById('r');
+  r.innerHTML = `Link: <a href="${l}">${l}</a> <button type="button" onclick="navigator.clipboard.writeText('${l}')">Copy</button>`;
+  r.style.display = 'block';
 }
 </script>
 </body>
